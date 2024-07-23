@@ -55,13 +55,15 @@ const { GlobalKeyboardListener } = require("node-global-key-listener");
                 process.stdout.write(`(${iteration+1}/${helperInstructions.length}) ${currentAction}\n`);
                 let startTime = Date.now();
                 let remaining = duration;
+
                 while (remaining > 0) {
                     await new Promise(resolve => setTimeout(resolve, remaining > 1000 ? 1000 : remaining));
                     let elapsed = Date.now() - startTime;
                     remaining = duration - elapsed;
-                    // convert remaining to mm:ss:ms
+
                     let minutes = Math.floor(remaining / 60000);
                     let seconds = ((remaining % 60000) / 1000).toFixed(0);
+
                     process.stdout.clearLine(-1);
                     process.stdout.write(`\r${nextAction} in ${minutes}:${seconds.padStart(2, '0')}`);
                 }
@@ -88,6 +90,6 @@ const { GlobalKeyboardListener } = require("node-global-key-listener");
         welcomePrompt();
 
     } catch (err) {
-        console.error(err); // Something went wrong
+        console.error(err);
     }
 })();
