@@ -1,0 +1,33 @@
+{
+  "name": "tr2-xian-skip-helper",
+  "version": "1.0.0",
+  "description": "A tool to help practice the Temple of Xian skip in Tomb Raider 2",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaredS129/tr2-xian-skip-helper.git"
+  },
+  "keywords": [
+    "tomb",
+    "raider",
+    "2",
+    "temple",
+    "xian",
+    "skip",
+    "speedrun",
+    "helper"
+  ],
+  "author": "JaredS129, Naircol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JaredS129/tr2-xian-skip-helper/issues"
+  },
+  "homepage": "https://github.com/JaredS129/tr2-xian-skip-helper#readme",
+  "dependencies": {
+    "node-global-key-listener": "^0.3.0"
+  }
+}
