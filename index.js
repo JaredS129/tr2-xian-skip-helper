@@ -1,4 +1,5 @@
 const { GlobalKeyboardListener } = require("node-global-key-listener");
+const LiveSplitClient = require('livesplit-client');
 
 (async () => {
     try {
@@ -86,6 +87,32 @@ const { GlobalKeyboardListener } = require("node-global-key-listener");
                 helperSequence();
             }
         });
+
+        const getLiveSplit = async () => {
+            try {
+                // Initialize client with LiveSplit Server's IP:PORT
+                const client = new LiveSplitClient('127.0.0.1:16834');
+
+                await client.connect();
+
+                return client;
+
+            } catch (err) {
+                console.error(err);
+                return null;
+            }
+        }
+
+        let liveSplit = null;
+
+        liveSplit = await getLiveSplit();
+
+        if (liveSplit) {
+            console.log('LiveSplit connected successfully!');
+            console.log('Current Time: ' + await liveSplit.getCurrentTime());
+        } else {
+            console.log('LiveSplit connection failed. Xian Skip Helper will run without LiveSplit integration.');
+        }
 
         welcomePrompt();
 

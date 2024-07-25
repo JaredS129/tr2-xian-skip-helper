@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/JaredS129/tr2-xian-skip-helper#readme",
   "dependencies": {
+    "livesplit-client": "^1.0.4",
     "node-global-key-listener": "^0.3.0"
   }
 }
