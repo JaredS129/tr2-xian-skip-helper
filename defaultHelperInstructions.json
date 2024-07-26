@@ -1,0 +1,44 @@
+[
+    {
+      "currentAction": "UP + ACTION",
+      "nextAction": "DOWN + WALK",
+      "duration": 24000,
+      "time": "0:00"
+    },
+    {
+      "currentAction": "DOWN + WALK",
+      "nextAction": "UP + ACTION",
+      "duration": 36000,
+      "time": "0:24"
+    },
+    {
+      "currentAction": "UP + ACTION",
+      "nextAction": "DOWN + WALK",
+      "duration": 24000,
+      "time": "1:00"
+    },
+    {
+      "currentAction": "DOWN + WALK",
+      "nextAction": "UP + ACTION",
+      "duration": 30000,
+      "time": "1:24"
+    },
+    {
+      "currentAction": "UP + ACTION",
+      "nextAction": "BACK + WALK",
+      "duration": 24000,
+      "time": "1:54"
+    },
+    {
+      "currentAction": "BACK + WALK",
+      "nextAction": "ROLL + UP/LEFT",
+      "duration": 3000,
+      "time": "2:18"
+    },
+    {
+      "currentAction": "ROLL + UP/LEFT",
+      "nextAction": null,
+      "duration": 0,
+      "time": "2:21"
+    }
+  ]

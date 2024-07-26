@@ -1,122 +1,94 @@
-const { GlobalKeyboardListener } = require("node-global-key-listener");
+const {GlobalKeyboardListener} = require("node-global-key-listener");
 const LiveSplitClient = require('livesplit-client');
+const defaultHelperInstructions = require('./defaultHelperInstructions.json');
+const getTotalSeconds = require('./utils/getTotalSeconds');
+const getTimeFromSeconds = require('./utils/getTimeFromSeconds');
 
 (async () => {
-    try {
-        const globalKeyListener = new GlobalKeyboardListener();
-        let sequenceIsRunning = false;
+    const globalKeyListener = new GlobalKeyboardListener();
 
-        const helperInstructions = [
-            {
-                currentAction: 'UP + ACTION',
-                nextAction: 'DOWN + WALK',
-                duration: 24000
-            },
-            {
-                currentAction: 'DOWN + WALK',
-                nextAction: 'UP + ACTION',
-                duration: 36000
-            },
-            {
-                currentAction: 'UP + ACTION',
-                nextAction: 'DOWN + WALK',
-                duration: 24000
-            },
-            {
-                currentAction: 'DOWN + WALK',
-                nextAction: 'UP + ACTION',
-                duration: 30000
-            },
-            {
-                currentAction: 'UP + ACTION',
-                nextAction: 'BACK + WALK',
-                duration: 24000
-            },
-            {
-                currentAction: 'BACK + WALK',
-                nextAction: 'ROLL + UP/LEFT',
-                duration: 3000
-            },
-            {
-                currentAction: 'ROLL + UP/LEFT',
-                nextAction: null,
-                duration: 0
-            }
-        ]
+    let liveSplit;
 
-        const welcomePrompt = () => {
-            console.log('Xian Skip Helper is running! Press "/" to begin the timing sequence.');
-        }
+    const actionTimeDefaults = [
+        '0:00',
+        '0:24',
+        '1:00',
+        '1:24',
+        '1:54',
+        '2:18',
+        '2:21'
+    ]
 
-        const helperSequence = async () => {
-            sequenceIsRunning = true;
-            console.clear();
+    let helperInstructions = defaultHelperInstructions;
 
-            const countdown = async (currentAction, nextAction, duration, iteration) => {
-                process.stdout.write(`(${iteration+1}/${helperInstructions.length}) ${currentAction}\n`);
-                let startTime = Date.now();
-                let remaining = duration;
-
-                while (remaining > 0) {
-                    await new Promise(resolve => setTimeout(resolve, remaining > 1000 ? 1000 : remaining));
-                    let elapsed = Date.now() - startTime;
-                    remaining = duration - elapsed;
-
-                    let minutes = Math.floor(remaining / 60000);
-                    let seconds = ((remaining % 60000) / 1000).toFixed(0);
-
-                    process.stdout.clearLine(-1);
-                    process.stdout.write(`\r${nextAction} in ${minutes}:${seconds.padStart(2, '0')}`);
-                }
-                process.stdout.clearLine(-1);
-                process.stdout.write('\r');
-            }
-
-            for (let i = 0; i < helperInstructions.length; i++) {
-                const { currentAction, nextAction, duration } = helperInstructions[i];
-                await countdown(currentAction, nextAction, duration, i);
-            }
-
-            console.log("GL Tombin'!");
-            sequenceIsRunning = false;
-            welcomePrompt();
-        }
-
-        await globalKeyListener.addListener(function (e) {
-            if (e.name === "FORWARD SLASH" && !sequenceIsRunning) {
-                helperSequence();
-            }
+    const resetActionTimes = () => {
+        helperInstructions = helperInstructions.map((instruction, index) => {
+            instruction.time = actionTimeDefaults[index];
+            return instruction;
         });
-
-        const getLiveSplit = async () => {
-            try {
-                // Initialize client with LiveSplit Server's IP:PORT
-                const client = new LiveSplitClient('127.0.0.1:16834');
-
-                await client.connect();
-
-                return client;
-
-            } catch (err) {
-                console.error(err);
-                return null;
-            }
-        }
-
-        let liveSplit = null;
-
-        liveSplit = await getLiveSplit();
-
-        if (liveSplit) {
-            console.log('LiveSplit connected successfully!');
-            console.log('Current Time: ' + await liveSplit.getCurrentTime());
-        } else {
-            console.log('LiveSplit connection failed. Xian Skip Helper will run without LiveSplit integration.');
-        }
-
-        welcomePrompt();
-
-    } catch (err) {
-        console.error(err);
     }
+
+    const welcomePrompt = () => {
+        console.log('Xian Skip Helper is running! Press "/" to calculate the timing sequence.');
+    }
+
+    const calculateActionTimes = async () => {
+        const currentTime = await liveSplit.getCurrentTime();
+        let totalSeconds = getTotalSeconds(currentTime);
+        resetActionTimes();
+
+        for (let i = 0; i < helperInstructions.length; i++) {
+            let {time} = helperInstructions[i];
+            const timeInSeconds = getTotalSeconds(time);
+            const newTimeInSeconds = timeInSeconds + totalSeconds;
+            helperInstructions[i].time = getTimeFromSeconds(newTimeInSeconds);
+
+            // totalSeconds = totalSeconds + (duration / 1000);
+        }
+    }
+
+    await globalKeyListener.addListener(function (e) {
+
+        if (e.name === "FORWARD SLASH") {
+            liveSplit && calculateActionTimes();
+            console.clear();
+            console.log(`---------XIAN SKIP SEQUENCE---------\n
+${helperInstructions[0].currentAction}:     ${helperInstructions[0].time}
+${helperInstructions[1].currentAction}:     ${helperInstructions[1].time}
+${helperInstructions[2].currentAction}:     ${helperInstructions[2].time}
+${helperInstructions[3].currentAction}:     ${helperInstructions[3].time}
+${helperInstructions[4].currentAction}:     ${helperInstructions[4].time}
+${helperInstructions[5].currentAction}:     ${helperInstructions[5].time}
+${helperInstructions[6].currentAction}:  ${helperInstructions[6].time}
+\n-----------------------------------`);
+            console.log("\nGL Tombin'!");
+            console.log('Press "/" to recalculate.');
+            // helperSequence();
+        }
+    });
+
+    const getLiveSplit = async () => {
+        try {
+            // Initialize client with LiveSplit Server's IP:PORT
+            const client = new LiveSplitClient('127.0.0.1:16834');
+
+            await client.connect();
+
+            return client;
+
+        } catch (err) {
+            console.log('LiveSplit connection failed. Please make sure LiveSplit Server is running and try again.\n');
+            return null;
+        }
+    }
+
+    liveSplit = await getLiveSplit();
+
+    if (liveSplit) {
+        console.log('LiveSplit connected successfully!\n');
+    } else {
+        console.log('LiveSplit connection failed. Please make sure LiveSplit Server is running and try again.\n');
+    }
+
+    welcomePrompt();
 })();
