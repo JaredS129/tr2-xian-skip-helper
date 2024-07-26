@@ -12,8 +12,6 @@ A command-line tool to help practice the Temple of Xian skip in Tomb Raider 2 (P
    - You will need to have the LiveSplit Server component installed in LiveSplit. Download the zip [here](https://github.com/LiveSplit/LiveSplit.Server/releases).
    - Place the contents of the downloaded zip into the "LiveSplit\Components" directory.
    - Add the LiveSplit Server component to your LiveSplit Layout (Edit Layout -> + -> Control -> LiveSplit Server).
-4. **Git**
-   - Download and install the latest version of Git from [here](https://git-scm.com/downloads).
 
 ## Usage
 
